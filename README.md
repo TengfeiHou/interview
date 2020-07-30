@@ -93,7 +93,7 @@ nms目前存在的问题：
 
 * Soft NMS
   
-![img](img\softnms.svg)
+![img](img/softnms.svg)
 
 采用这种得分衰减方式，对于某些得分很高的边框，在后续计算中还有可能被作为正确检测框，而不像NMS那样“一棒子打死”，因此可以有效地提升模型召回率
 
@@ -103,14 +103,14 @@ nms目前存在的问题：
 
 具体过程与NMS大体相同，只是对预测标注方差范围内的候选框加权平均，使其更精准 简单来说 不删除框 而是融合  给个图自己体会吧，对了，输出的也比平常检测网络多四个，就是四个左边的sigma值
 
-![img](img\softernms.png)
+![img](img/softernms.png)
 
 * Adaptive NMS 
 
 通过网络预测目标周边的密集和稀疏的程度，采用不同的去重策略。
 
-![img](img\adptivenms1.png)
-![img](img\adptivenms2.jpeg)
+![img](img/adptivenms1.png)
+![img](img/adptivenms2.jpeg)
 
 1. 当邻框远离M时（即IoU<Nt），保持si不变；
 2. 当M处于密集区域时（即Nm>Nt），目标密度dM作为NMS的抑制阈值；
@@ -124,15 +124,15 @@ nms目前存在的问题：
 
 例如拿到如下的结果
 
-![img](img\map1.png)
+![img](img/map1.png)
 
 从头开始加入不同数量的数据都能算出对应的recall和precision  recall肯定是非递减的，那么就可以画出一个recall和precision的曲线
 
-![img](img\map2.png)
+![img](img/map2.png)
 
 经过recall的插值，把折线换成直的线，计算线下面积
 
-![img](img\map3.jpeg)
+![img](img/map3.jpeg)
 
 COCO的AP是所有类别，所有iou 0.5到0.95的平均  具体一个ap还是上述算法
 
