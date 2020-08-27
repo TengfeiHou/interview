@@ -1,6 +1,119 @@
+[TOC]
+
 # 面试问题汇总
 
 ## 机器学习
+
+### 梯度下降法
+
+对每一个参数求偏导，乘上步长进行优化
+
+变体：
+
+1. BGD批量梯度下降法：更新参数的时候使用所有的样本进行更新
+2. SGD随机梯度下降法：只使用随机一个样本进行梯度下降，和BGD的对比是，速度快，但是下降不稳定
+3. Mini-batch Gradient Descent小批量梯度下降法：折衷一下1，2
+
+与其他优化方法比较：
+相较于最小二乘法，后者需要解析解，计算更慢
+和牛顿法/拟牛顿法相比，两者都是迭代求解，不过梯度下降法是梯度求解，而牛顿法/拟牛顿法是用二阶的海森矩阵的逆矩阵或伪逆矩阵求解。相对而言，使用牛顿法/拟牛顿法收敛更快。但是每次迭代的时间比梯度下降法长。
+
+
+### 牛顿法 拟牛顿法
+
+牛顿法（Newton method）和拟牛顿法(quasi-Newton method)也是求解无约束最优化问题的常用方法，有收敛速度快的优点。牛顿法是迭代算法，每一步需要求解目标函数的黑塞矩阵的逆矩阵，计算比较复杂。拟牛顿法通过正定矩阵近似黑塞矩阵
+
+* 对于牛顿法：
+
+对原函数进行泰勒展开为：
+
+![img](img/newton.png)
+
+对这个函数求一阶导，让其等于0，得到x的迭代关系
+
+![img](img/newton2.png)
+
+![img](img/newton34.png)
+
+*  拟牛顿法：
+
+在牛顿法的迭代中，需要计算黑塞矩阵的逆矩阵H^-1，这一计算比较复杂，考虑用一个n阶矩阵G= Gk来近似代替H^-1。这就是拟牛顿法的基本想法
+
+有牛顿法的一阶导的表达式代入xk-1 可得
+
+![img](img/ninewton.png)
+
+得到拟牛顿法的条件
+
+拟牛顿法在迭代过程中更新矩阵G 根据不同的实现方法 又分为更多的拟牛顿法
+
+### 样本不平衡问题
+
+算法层面：svm，决策树，对于类别不平衡表现较好
+
+数据层面：采样
+
+loss层面： focal loss
+
+
+### 过拟合
+
+1. 获取更多数据，数据增强，GAN
+2. 减少网络参数，不要训练过长时间
+3. 正则化 bn，weight decay，dropout
+4. 加噪声
+5. 多模型bagging boosting
+6. label smoothing， 自学习，mixup等新的方法
+
+### 生成模型 vs 判别模型
+
+生成模型：学习得到联合概率分布P(x,y)，即特征x和标记y共同出现的概率，然后求条件概率分布。能够学习到数据生成的机制
+
+* 生成模型：朴素贝叶斯方法，隐马尔可夫模型
+* 判别模型：k近邻法，感知机，决策树，逻辑斯蒂回归模型，最大熵模型，svm，提升方法，条件随机场
+
+* 优点
+  
+1. 可以得到分布的更多信息
+2. 收敛速度快，数据较多时，更快的收敛于真实模型
+3. 能够应付隐变量存在的情况
+
+* 缺点
+  
+1. 效果没有判别式好
+2. 需要更多计算和数据
+
+判别模型：习得到条件概率分布P(y|x)，即在特征x出现的情况下标记y出现的概率
+
+* 优点
+
+1. 节省计算，训练集需要相对较少
+2. 准确率高
+3. 允许对对输入进行降维，构造，简化问题
+
+* 缺点
+
+1. 生成模型的好处没得 
+
+### 决策树是怎么样进行划分的，决策树的损失函数
+
+* ID3: 信息增益  H(D)-H(D|A)
+
+* C4.5：信息增益比 (H(D)-H(D|A))/H_A(D) ,  H_A(D)就是D数据在A的分类下的熵
+
+* CART：
+  1. 回归树：平方误差最小
+  2. 基尼系数最小 Gini(p) = Σ_k p_k (1-p_k) = 1 - Σ_k (p_k)^2。 
+     
+     在特征值为A的情况下，Gini(D,A)= |D1|/|D|\*(Gini(D1)) + |D2|/|D|\*(Gini(D2))
+
+### 随机森林
+
+
+
+### 推导朴素贝叶斯公式
+
+![](img/bayes.png)
 
 ### l1,l2正则化
 
@@ -29,6 +142,16 @@
 1. l1正则化则会使原最优解的元素产生不同量的偏移，并使某些元素为0，从而产生稀疏性。
 2. l2正则化的效果是对原最优解的每个元素进行不同比例的放缩
 
+l1产生稀疏性理解：
+
+![img](img/l1norm.png)
+
+红框为l1正则约束，蓝色是优化函数的等高线，蓝色是梯度方向，但是由于正则约束只能向w2方向移动，造成了w1的抑制，所以产生了稀疏性。
+
+因为 L1 天然的输出稀疏性，把不重要的特征都置为 0，所以它也是一个天然的特征选择器。
+
+但是L2计算起来更方便，而 L1在特别是非稀疏向量上的计算效率就很低；
+
 [更详细解释看这里](https://zhuanlan.zhihu.com/p/29360425)
 
 ### 最大似然函数 最大后验概率  区别
@@ -52,8 +175,11 @@ SVM的构造,SVM的损失函数:
     
 SVM的核函数:
 
+核函数：K(x,z) = Φ(x)*Φ(z)
 
+核技巧为只定义K，而不显示的定义映射函数，同一核函数的映射不唯一
 
+常用核函数：多项式核函数，高斯核函数，字符串核函数
 
 ### sigmoid softmax lr 
 都跟exp()有关系
@@ -132,9 +258,53 @@ ROC曲线的横轴是FP，纵轴是TP,如果二者相同，表示的意义是：
 
 ### 手撕卷积层
 
+```python
+## CNN 前传
 
-### 如何计算输出的特征大小 
+def conv_forward_naive(x, w, b, conv_param):
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    pad, stride = conv_param["pad"], conv_param["stride"]
+    X = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), "constant")
+    
+    H_out = 1 + int((H + 2 * pad - HH) / stride)
+    W_out = 1 + int((W + 2 * pad - WW) / stride)
+    out = np.zeros((N, F, H_out, W_out))
+    
+    for n in range(N):
+        for f in range(F):
+            for i in range(H_out):
+                for j in range(W_out):
+                    data = X[n, :, i * stride: i * stride + HH, j * stride: j * stride + WW].reshape(1, -1)
+                    filt = w[f, :, :, :].reshape(-1, 1)
+                    out[n, f, i, j] = data.dot(filt) + b[f]
+                    
+    cache = (x, w, b, conv_param)
+    return out, cache
 
+## CNN后传
+
+def conv_backward_naive(dout, cache):
+    x, w, b, conv_param = cache
+    N, F, H_out, W_out = dout.shape
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    pad, stride = conv_param["pad"], conv_param["stride"]
+    X = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), "constant")
+    dw = np.zeros_like(w)
+    dX = np.zeros_like(X)
+    
+    for n in range(N):
+        for f in range(F):
+            for i in range(H_out):
+                for j in range(W_out):
+                    dX[n, :, i * stride: i * stride + HH, j * stride: j * stride + WW] += w[f] * dout[n, f, i, j]
+                    dw[f] += X[n, :, i * stride: i * stride + HH, j * stride: j * stride + WW] * dout[n, f, i, j]
+                    
+    db = np.sum(dout, axis=(0, 2, 3))
+    dx = dX[:, :, pad: -pad, pad: -pad]
+    return dx, dw, db
+```
 
 ### pytorch 基本训练代码怎么写
 
@@ -145,6 +315,23 @@ ROC曲线的横轴是FP，纵轴是TP,如果二者相同，表示的意义是：
 
 ### some backbones
 
+### faster RCNN 偏移
+
+```matlab
+Ground Truth: gx, gy, gw, gh
+Anchor:       ax, ay, aw, ah
+
+tx = (gx-ax)/aw
+
+ty = (gy-ay)/ah
+
+tw = log(gw/aw)
+
+th = log(gh/ah)
+```
+
+预测 px,py,pw,ph以接近 tx, ty, tw, th
+
 
 ### 梯度爆炸
 本质上是因为梯度反向传播中的连乘效应
@@ -153,11 +340,11 @@ ROC曲线的横轴是FP，纵轴是TP,如果二者相同，表示的意义是：
 
 解决方案：
 1. 预训练加微调
-2. 梯度剪切：对梯度设定阈值：如果梯度超过这个阈值，那么就将其强制限制在这个范围之内。这可以防止梯度爆炸
+2. 梯度剪切：对梯度设定阈值：如果梯度超过这个阈值，那么就将其强制限制在这个范围之内。这可以防止**梯度爆炸**
 3. 权重正则化：比较常见的是 L1 正则和 L2 正则
 4. 选择relu等梯度大部分落在常数上的激活函数
 5. batch normalization
-6. 残差网络的捷径（shortcut）
+6. 残差网络的捷径（shortcut） 解决的是**梯度消失**
 7. LSTM的“门（gate）”结构
 
 ### 1*1 卷积核作用
@@ -306,6 +493,36 @@ nms目前存在的问题：
 
 COCO的AP是所有类别，所有iou 0.5到0.95的平均  具体一个ap还是上述算法
 
+### roi align & roi pooling
+
+roi pooling的两次取整：
+
+1. 原图中有一region proposal，大小为665\*665，这样映射到特征图中的大小：665/32=20.78,即20.78\*20.78，如果你看过Caffe的Roi Pooling的C++源码，在计算的时候会进行取整操作，于是，进行所谓的第一次量化，即映射的特征图大小为20\*20
+2. pooling后固定成7\*7大小的特征图，所以，将上面在 feature map上映射的20\*20的 region  proposal划分成49个同等大小的小区域，每个小区域的大小20/7=2.86,即2.86\*2.86，此时，进行第二次量化，故小区域大小变成2\*2 
+
+
+roi align的保留小数：
+
+1. 原图中有一region proposal，大小为665\*665，这样，映射到特征图中的大小：665/32=20.78,即20.78\*20.78，此时，没有像RoiPooling那样就行取整操作，保留浮点数
+2. pooling后固定成7\*7大小的特征图，所以，将在 feature map上映射的20.78\*20.78的region proposal 划分成49个同等大小的小区域，每个小区域的大小20.78/7=2.97,即2.97\*2.97
+3. 假定采样点数为4，即表示，对于每个2.97*2.97的小区域，平分四份，每一份取其中心点位置，而中心点位置的像素，采用双线性插值法进行计算，这样，就会得到四个点的像素值，如下图
+
+![img](img/roialign.png)
+
+上图中，四个红色叉叉的像素值是通过双线性插值算法计算得到的
+
+最后，取四个像素值中最大值作为这个小区域(即：2.97\*2.97大小的区域)的像素值，如此类推，同样是49个小区域得到49个像素值，组成7\*7大小的feature map
+
+### focal loss
+
+![img](img/focalloss.png)
+
+相对于直接对CE加参数能够通过减少易分类样本的权重，从而使得模型在训练时更专注于难分类的样本。
+
+两方面作用：
+
+1. 调制系数就趋于1，也就是说相比原来的loss是没有什么大的改变的。当pt趋于1的时候（此时分类正确而且是易分类样本），调制系数趋于0，也就是对于总的loss的贡献很小 
+2. 当γ=0的时候，focal loss就是传统的交叉熵损失，当γ增加的时候，调制系数也会增加。 专注参数γ平滑地调节了易分样本调低权值的比例。γ增大能增强调制因子的影响
 
 
 ### iou计算
